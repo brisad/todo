@@ -159,6 +159,11 @@ a:focus {
     font-size: 18px;
 }
 
+table.todo a {
+    font-size: 18px;
+    color: #fff;
+}
+
 @media(min-width:767px) {
     .intro {
         height: 100%;
@@ -170,6 +175,10 @@ a:focus {
     }
 
     .intro .intro-body .intro-text {
+        font-size: 25px;
+    }
+
+    table.todo a {
         font-size: 25px;
     }
 }
