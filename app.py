@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, g
 from pymongo import MongoClient
 
 DATABASE = 'mongodb://localhost:27017/'
@@ -22,7 +22,8 @@ def teardown_request(exception):
 
 @app.route('/')
 def root():
-    return render_template('index.html')
+    items = list(g.db.todo.items.find())
+    return render_template('index.html', items=items)
 
 if __name__ == '__main__':
     app.run(debug=True)
