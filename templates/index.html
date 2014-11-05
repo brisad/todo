@@ -96,7 +96,19 @@
                         <p class="intro-text">The things I'm doing.</p>
                         <table class="table todo">
                           {% for item in items %}
-                            <tr><td><a class="page-scroll" href="#{{ item.name }}">{{ item.name }}</a></td></tr>
+                            <tr><td>
+                                <a class="page-scroll" href="#{{ item.name }}">{{ item.name }}</a>
+
+                                {% if session.logged_in %}
+                                <div class="buttons">
+                                    <a><span class="glyphicon glyphicon-arrow-up"></span></a>
+                                    <a><span class="glyphicon glyphicon-arrow-down"></span></a>
+                                    <a><span class="glyphicon glyphicon-edit"></span></a>
+                                    <a><span class="glyphicon glyphicon-remove"></span></a>
+                                </div>
+                                {% endif %}
+
+                            </tr></td>
                           {% endfor %}
                         </table>
                     </div>

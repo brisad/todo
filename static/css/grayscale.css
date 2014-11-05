@@ -183,6 +183,11 @@ table.todo a {
     color: #fff;
 }
 
+div.buttons {
+    display: inline;
+    float: right;
+}
+
 @media(min-width:767px) {
     .intro {
         height: 100%;
