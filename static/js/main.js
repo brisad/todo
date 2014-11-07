@@ -14,19 +14,31 @@ $('#loginModal form').keypress(function (e) {
 });
 
 $('.move-up').on('click', function () {
-    var row = $(this).closest('tr');
-    var name_id = $(this).closest('div.buttons').prev('a').attr('href');
-    var section = $(name_id);
+  var row = $(this).closest('tr');
+  var name_id = $(this).closest('div.buttons').prev('a').attr('href');
+  var section = $(name_id);
 
-    section.insertBefore(section.prev('section'));
-    row.insertBefore(row.prev());
+  section.insertBefore(section.prev('section'));
+  row.insertBefore(row.prev());
+
+  $.post("move_up",
+         { item: name_id.substr(1) },
+         function (data) {
+             alert(data);
+         });
 });
 
 $('.move-down').on('click', function () {
-    var row = $(this).closest('tr');
-    var name_id = $(this).closest('div.buttons').prev('a').attr('href');
-    var section = $(name_id);
+  var row = $(this).closest('tr');
+  var name_id = $(this).closest('div.buttons').prev('a').attr('href');
+  var section = $(name_id);
 
-    section.insertAfter(section.next('section'));
-    row.insertAfter(row.next());
+  section.insertAfter(section.next('section'));
+  row.insertAfter(row.next())
+
+  $.post("move_down",
+         { item: name_id.substr(1) },
+         function (data) {
+             alert(data);
+         });
 });

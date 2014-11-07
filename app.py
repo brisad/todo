@@ -30,6 +30,16 @@ def root():
     items = list(g.db.todo.items.find())
     return render_template('index.html', items=items)
 
+@app.route('/move_down', methods=['POST'])
+def move_down():
+    #request.form['item']
+    pass
+
+@app.route('/move_up', methods=['POST'])
+def move_up():
+    #request.form['item']
+    pass
+
 @app.route('/login', methods=['POST'])
 def login():
     if (request.form['username'] != app.config['USERNAME'] or
