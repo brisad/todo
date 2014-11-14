@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for
-from flask import g, session, flash
-from pymongo import MongoClient
+from flask import g, session, flash, jsonify, make_response
+from pymongo import MongoClient, ASCENDING
 
 DATABASE = 'mongodb://localhost:27017/'
 SECRET_KEY = 'temporary_secret'
@@ -27,18 +27,36 @@ def teardown_request(exception):
 
 @app.route('/')
 def root():
-    items = list(g.db.todo.items.find())
+    items = list(g.db.todo.items.find().sort('order', ASCENDING))
     return render_template('index.html', items=items)
 
 @app.route('/move_down', methods=['POST'])
 def move_down():
-    #request.form['item']
-    pass
+    db_item = g.db.todo.items.find_one({'name': request.form['item']})
+    order = db_item['order']
+    next_item = g.db.todo.items.find_one({'order': order + 1})
+
+    if next_item is None:
+        return make_response(jsonify({'error': 'last item'}), 400)
+
+    g.db.todo.items.update({'_id': db_item['_id']}, {'$inc': {'order': 1}})
+    g.db.todo.items.update({'_id': next_item['_id']}, {'$inc': {'order': -1}})
+    # Just assuming it works...
+    return jsonify({'result': True})
 
 @app.route('/move_up', methods=['POST'])
 def move_up():
-    #request.form['item']
-    pass
+    db_item = g.db.todo.items.find_one({'name': request.form['item']})
+    order = db_item['order']
+    prev_item = g.db.todo.items.find_one({'order': order - 1})
+
+    if prev_item is None:
+        return make_response(jsonify({'error': 'last item'}), 400)
+
+    g.db.todo.items.update({'_id': db_item['_id']}, {'$inc': {'order': -1}})
+    g.db.todo.items.update({'_id': prev_item['_id']}, {'$inc': {'order': 1}})
+    # Just assuming it works...
+    return jsonify({'result': True})
 
 @app.route('/login', methods=['POST'])
 def login():

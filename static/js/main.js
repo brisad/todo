@@ -21,11 +21,7 @@ $('.move-up').on('click', function () {
   section.insertBefore(section.prev('section'));
   row.insertBefore(row.prev());
 
-  $.post("move_up",
-         { item: name_id.substr(1) },
-         function (data) {
-             alert(data);
-         });
+  $.post("move_up", { item: name_id.substr(1) });
 });
 
 $('.move-down').on('click', function () {
@@ -36,9 +32,5 @@ $('.move-down').on('click', function () {
   section.insertAfter(section.next('section'));
   row.insertAfter(row.next())
 
-  $.post("move_down",
-         { item: name_id.substr(1) },
-         function (data) {
-             alert(data);
-         });
+  $.post("move_down", { item: name_id.substr(1) })
 });
