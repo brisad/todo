@@ -97,7 +97,7 @@
                         <table class="table todo">
                           {% for item in items %}
                             <tr><td>
-                                <a class="page-scroll" href="#{{ item.name }}">{{ item.name }}</a>
+                                <a class="page-scroll" href="#{{ item._id }}">{{ item._id }}</a>
 
                                 {% if session.logged_in %}
                                 <div class="buttons">
@@ -127,10 +127,10 @@
 
     {% for item in items %}
 
-    <section id="{{ item.name }}" class="container content-section text-center">
+    <section id="{{ item._id }}" class="container content-section text-center">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">
-                <h2>{{ item.name }}</h2>
+                <h2>{{ item._id }}</h2>
                 <div class="progress">
                   <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
                        aria-valuenow="{{ item.progress * 100 }}"
@@ -139,8 +139,7 @@
                     <span class="sr-only">{{ item.progress * 100 }}% Complete</span>
                   </div>
                 </div>
-                <p>{{ item.description }}</p>
-                <p><a href="{{ item.link }}">{{ item.link }}</a></p>
+                <p>{{ item.description|safe }}</p>
             </div>
         </div>
     </section>

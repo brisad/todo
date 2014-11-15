@@ -32,7 +32,7 @@ def root():
 
 @app.route('/move_down', methods=['POST'])
 def move_down():
-    db_item = g.db.todo.items.find_one({'name': request.form['item']})
+    db_item = g.db.todo.items.find_one({'_id': request.form['item']})
     order = db_item['order']
     next_item = g.db.todo.items.find_one({'order': order + 1})
 
@@ -46,7 +46,7 @@ def move_down():
 
 @app.route('/move_up', methods=['POST'])
 def move_up():
-    db_item = g.db.todo.items.find_one({'name': request.form['item']})
+    db_item = g.db.todo.items.find_one({'_id': request.form['item']})
     order = db_item['order']
     prev_item = g.db.todo.items.find_one({'order': order - 1})
 

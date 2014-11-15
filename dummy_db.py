@@ -3,19 +3,19 @@ from app import connect_db
 
 DUMMY_DATA = [
     {
-    'name': 'grec',
-    'description': 'Colorize terminal text with regular expressions.',
+    '_id': 'grec',
+    'description': '<p>Colorize terminal text with regular expressions.</p>' \
+                   '<p><a href="https://github.com/brisad/grec">https://github.com/brisad/grec</a></p>',
     'progress': .8,
-    'link': 'https://github.com/brisad/grec',
-    'updates': []
+    'order': 1
     },
 
     {
-    'name': 'kaimu',
-    'description': 'Easy file sharing between devices on the same local network.',
+    '_id': 'kaimu',
+    'description': '<p>Easy file sharing between devices on the same local network.</p>' \
+                   '<p><a href="https://github.com/brisad/kaimu">https://github.com/brisad/kaimu</a></p>',
     'progress': .4,
-    'link': 'https://github.com/brisad/kaimu',
-    'updates': []
+    'order': 2
     }
 ]
 
