@@ -3,13 +3,27 @@ $('#login').on("click", function () {
   $('#login-form').submit();
 });
 
+$('#add').on("click" ,function () {
+  $('#add-form').submit();
+});
+
 $('#loginModal').on('shown.bs.modal', function () {
   $('#username').focus();
+})
+
+$('#addModal').on('shown.bs.modal', function () {
+  $('#name').focus();
 })
 
 $('#loginModal form').keypress(function (e) {
   if (e.which == 13) {
     $('#login-form').submit();
+  }
+});
+
+$('#addModal form').keypress(function (e) {
+  if (e.which == 13) {
+    $('#add-form').submit();
   }
 });
 

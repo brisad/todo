@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for
-from flask import g, session, flash, jsonify, make_response
-from pymongo import MongoClient, ASCENDING
+from flask import g, session, flash, jsonify, make_response, abort
+from pymongo import MongoClient, ASCENDING, DESCENDING
 
 DATABASE = 'mongodb://localhost:27017/'
 SECRET_KEY = 'temporary_secret'
@@ -29,6 +29,25 @@ def teardown_request(exception):
 def root():
     items = list(g.db.todo.items.find().sort('order', ASCENDING))
     return render_template('index.html', items=items)
+
+@app.route('/add', methods=['POST'])
+def add_item():
+    if not session.get('logged_in'):
+        abort(401)
+
+    try:
+        progress = float(request.form['progress'])
+    except ValueError:
+        flash("Invalid value for progress")
+        return redirect(url_for('root'))
+
+    last_item = next(g.db.todo.items.find().sort('order', DESCENDING))
+    order = last_item['order'] + 1
+    g.db.todo.items.insert({'_id': request.form['name'],
+                            'progress': progress,
+                            'description': request.form['description'],
+                            'order': order})
+    return redirect(url_for('root'))
 
 @app.route('/move_down', methods=['POST'])
 def move_down():
