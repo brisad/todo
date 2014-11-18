@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, url_for
 from flask import g, session, flash, jsonify, make_response, abort
 from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo.errors import PyMongoError
 
 DATABASE = 'mongodb://localhost:27017/'
 SECRET_KEY = 'temporary_secret'
@@ -37,21 +38,55 @@ def add_item():
 
     try:
         progress = float(request.form['progress'])
+        if progress < 0:
+            progress = 0
+        if progress > 1:
+            progress = 1
     except ValueError:
         flash("Invalid value for progress")
         return redirect(url_for('root'))
 
-    last_item = next(g.db.todo.items.find().sort('order', DESCENDING))
-    order = last_item['order'] + 1
-    g.db.todo.items.insert({'_id': request.form['name'],
-                            'progress': progress,
-                            'description': request.form['description'],
-                            'order': order})
+    sorted_items = list(g.db.todo.items.find().sort('order', DESCENDING))
+    if sorted_items:
+        order = sorted_items[0]['order'] + 1
+    else:
+        order = 0
+
+    try:
+        g.db.todo.items.insert({'_id': request.form['name'],
+                                'progress': progress,
+                                'description': request.form['description'],
+                                'order': order})
+    except PyMongoError:
+        flash("Failed to add item")
+        return redirect(url_for('root'))
+
     return redirect(url_for('root'))
+
+@app.route('/remove', methods=['POST'])
+def remove_item():
+    if not session.get('logged_in'):
+        abort(401)
+
+    db_item = g.db.todo.items.find_one({'_id': request.form['item']})
+    if db_item is None:
+        return make_response(jsonify({'error': 'invalid item'}), 400)
+
+    order = db_item['order']
+    g.db.todo.items.remove({'_id': request.form['item']})
+
+    g.db.todo.items.update({'order': {'$gt': order}}, {'$inc': {'order': -1}})
+    return jsonify({'result': True})
 
 @app.route('/move_down', methods=['POST'])
 def move_down():
+    if not session.get('logged_in'):
+        abort(401)
+
     db_item = g.db.todo.items.find_one({'_id': request.form['item']})
+    if db_item is None:
+        return make_response(jsonify({'error': 'invalid item'}), 400)
+
     order = db_item['order']
     next_item = g.db.todo.items.find_one({'order': order + 1})
 
@@ -65,12 +100,18 @@ def move_down():
 
 @app.route('/move_up', methods=['POST'])
 def move_up():
+    if not session.get('logged_in'):
+        abort(401)
+
     db_item = g.db.todo.items.find_one({'_id': request.form['item']})
+    if db_item is None:
+        return make_response(jsonify({'error': 'invalid item'}), 400)
+
     order = db_item['order']
     prev_item = g.db.todo.items.find_one({'order': order - 1})
 
     if prev_item is None:
-        return make_response(jsonify({'error': 'last item'}), 400)
+        return make_response(jsonify({'error': 'first item'}), 400)
 
     g.db.todo.items.update({'_id': db_item['_id']}, {'$inc': {'order': -1}})
     g.db.todo.items.update({'_id': prev_item['_id']}, {'$inc': {'order': 1}})

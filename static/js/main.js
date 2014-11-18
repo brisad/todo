@@ -46,5 +46,13 @@ $('.move-down').on('click', function () {
   section.insertAfter(section.next('section'));
   row.insertAfter(row.next())
 
-  $.post("move_down", { item: name_id.substr(1) })
+  $.post("move_down", { item: name_id.substr(1) });
+});
+
+$('.remove-item').on('click', function () {
+  var row = $(this).closest('tr');
+  var name_id = $(this).closest('div.buttons').prev('a').attr('href');
+  var section = $(name_id);
+
+  $.post("remove", { item: name_id.substr(1) });
 });
