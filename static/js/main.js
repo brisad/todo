@@ -54,5 +54,10 @@ $('.remove-item').on('click', function () {
   var name_id = $(this).closest('div.buttons').prev('a').attr('href');
   var section = $(name_id);
 
-  $.post("remove", { item: name_id.substr(1) });
+  if (confirm("This will remove the item!")) {
+    section.remove();
+    row.remove();
+
+    $.post("remove", { item: name_id.substr(1) });
+  }
 });
