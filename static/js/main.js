@@ -32,7 +32,7 @@ $('.move-up').on('click', function () {
   var name_id = $(this).closest('div.buttons').prev('a').attr('href');
   var section = $(name_id);
 
-  section.insertBefore(section.prev('section'));
+  section.insertBefore(section.prev('.task'));
   row.insertBefore(row.prev());
 
   $.post("move_up", { item: name_id.substr(1) });
@@ -43,7 +43,7 @@ $('.move-down').on('click', function () {
   var name_id = $(this).closest('div.buttons').prev('a').attr('href');
   var section = $(name_id);
 
-  section.insertAfter(section.next('section'));
+  section.insertAfter(section.next('.task'));
   row.insertAfter(row.next())
 
   $.post("move_down", { item: name_id.substr(1) });

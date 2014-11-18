@@ -46,9 +46,9 @@ def add_item():
         flash("Invalid value for progress")
         return redirect(url_for('root'))
 
-    sorted_items = list(g.db.todo.items.find().sort('order', DESCENDING))
-    if sorted_items:
-        order = sorted_items[0]['order'] + 1
+    one_sorted_item = list(g.db.todo.items.find().sort('order', DESCENDING).limit(1))
+    if one_sorted_item:
+        order = one_sorted_item[0]['order'] + 1
     else:
         order = 0
 
