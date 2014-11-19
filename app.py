@@ -13,6 +13,10 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 
+class DataError(Exception):
+    pass
+
+
 def connect_db():
     return MongoClient(app.config['DATABASE'])
 
@@ -78,24 +82,40 @@ def remove_item():
     g.db.todo.items.update({'order': {'$gt': order}}, {'$inc': {'order': -1}})
     return jsonify({'result': True})
 
+def reorder(direction, name):
+    db_item = g.db.todo.items.find_one({'_id': name})
+    if db_item is None:
+        raise DataError('invalid item')
+
+    if direction == 'up':
+        offset = -1
+    else:
+        offset = 1
+
+    order = db_item['order']
+    other_item = g.db.todo.items.find_one({'order': order + offset})
+
+    if other_item is None:
+        if direction == 'up':
+            raise DataError('first item')
+        else:
+            raise DataError('last item')
+
+    g.db.todo.items.update(
+        {'_id': db_item['_id']}, {'$inc': {'order': offset}})
+    g.db.todo.items.update(
+        {'_id': other_item['_id']}, {'$inc': {'order': -offset}})
+
 @app.route('/move_down', methods=['POST'])
 def move_down():
     if not session.get('logged_in'):
         abort(401)
 
-    db_item = g.db.todo.items.find_one({'_id': request.form['item']})
-    if db_item is None:
-        return make_response(jsonify({'error': 'invalid item'}), 400)
+    try:
+        reorder('down', request.form['item'])
+    except DataError as error:
+        return make_response(jsonify({'error': str(error)}), 400)
 
-    order = db_item['order']
-    next_item = g.db.todo.items.find_one({'order': order + 1})
-
-    if next_item is None:
-        return make_response(jsonify({'error': 'last item'}), 400)
-
-    g.db.todo.items.update({'_id': db_item['_id']}, {'$inc': {'order': 1}})
-    g.db.todo.items.update({'_id': next_item['_id']}, {'$inc': {'order': -1}})
-    # Just assuming it works...
     return jsonify({'result': True})
 
 @app.route('/move_up', methods=['POST'])
@@ -103,19 +123,11 @@ def move_up():
     if not session.get('logged_in'):
         abort(401)
 
-    db_item = g.db.todo.items.find_one({'_id': request.form['item']})
-    if db_item is None:
-        return make_response(jsonify({'error': 'invalid item'}), 400)
+    try:
+        reorder('up', request.form['item'])
+    except DataError as error:
+        return make_response(jsonify({'error': str(error)}), 400)
 
-    order = db_item['order']
-    prev_item = g.db.todo.items.find_one({'order': order - 1})
-
-    if prev_item is None:
-        return make_response(jsonify({'error': 'first item'}), 400)
-
-    g.db.todo.items.update({'_id': db_item['_id']}, {'$inc': {'order': -1}})
-    g.db.todo.items.update({'_id': prev_item['_id']}, {'$inc': {'order': 1}})
-    # Just assuming it works...
     return jsonify({'result': True})
 
 @app.route('/login', methods=['POST'])
