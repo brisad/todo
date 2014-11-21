@@ -3,16 +3,8 @@ from flask import g, session, flash, jsonify, make_response, abort
 from pymongo import MongoClient
 import model
 
-
-DATABASE = 'mongodb://localhost:27017/'
-SECRET_KEY = 'temporary_secret'
-DEBUG = True
-USERNAME = 'michael'
-PASSWORD = 'secret'
-
 app = Flask(__name__)
-app.config.from_object(__name__)
-
+app.config.from_pyfile('config.py')
 
 def connect_db():
     return MongoClient(app.config['DATABASE'])
