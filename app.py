@@ -9,19 +9,22 @@ app.config.from_pyfile('config.py')
 def connect_db():
     return MongoClient(app.config['DATABASE'])
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
+def get_db():
+    if not hasattr(g, 'db'):
+        g.db = connect_db()
+    return g.db
 
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+def db_items():
+    return get_db().todo.items
+
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'db'):
+        g.db.close()
 
 @app.route('/')
 def root():
-    items = model.get_all(g.db.todo.items)
+    items = model.get_all(db_items())
     return render_template('index.html', items=items)
 
 # Not reached with an AJAX request
@@ -41,7 +44,7 @@ def add_item():
         return redirect(url_for('root'))
 
     try:
-        model.add(g.db.todo.items,
+        model.add(db_items(),
                   request.form['name'], progress, request.form['description'])
     except model.DataError:
         flash("Failed to add item")
@@ -55,7 +58,7 @@ def remove_item():
         abort(401)
 
     try:
-        model.remove(g.db.todo.items, request.form['item'])
+        model.remove(db_items(), request.form['item'])
     except model.DataError as error:
         return make_response(jsonify({'error': str(error)}), 400)
 
@@ -78,7 +81,7 @@ def edit_item():
         return redirect(url_for('root'))
 
     try:
-        model.update(g.db.todo.items,
+        model.update(db_items(),
                      request.form['name'], progress, request.form['description'])
     except model.DataError:
         flash("Failed to update item")
@@ -92,7 +95,7 @@ def move_down():
         abort(401)
 
     try:
-        model.reorder(g.db.todo.items, 'down', request.form['item'])
+        model.reorder(db_items(), 'down', request.form['item'])
     except model.DataError as error:
         return make_response(jsonify({'error': str(error)}), 400)
 
@@ -104,7 +107,7 @@ def move_up():
         abort(401)
 
     try:
-        model.reorder(g.db.todo.items, 'up', request.form['item'])
+        model.reorder(db_items(), 'up', request.form['item'])
     except model.DataError as error:
         return make_response(jsonify({'error': str(error)}), 400)
 
