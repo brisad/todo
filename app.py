@@ -32,6 +32,7 @@ def root():
     items = model.get_all(g.db.todo.items)
     return render_template('index.html', items=items)
 
+# Not reached with an AJAX request
 @app.route('/add', methods=['POST'])
 def add_item():
     if not session.get('logged_in'):
@@ -67,6 +68,31 @@ def remove_item():
         return make_response(jsonify({'error': str(error)}), 400)
 
     return jsonify({'result': True})
+
+# Not reached with an AJAX request
+@app.route('/edit', methods=['POST'])
+def edit_item():
+    if not session.get('logged_in'):
+        abort(401)
+
+    try:
+        progress = float(request.form['progress'])
+        if progress < 0:
+            progress = 0
+        if progress > 1:
+            progress = 1
+    except ValueError:
+        flash("Invalid value for progress")
+        return redirect(url_for('root'))
+
+    try:
+        model.update(g.db.todo.items,
+                     request.form['name'], progress, request.form['description'])
+    except model.DataError:
+        flash("Failed to update item")
+        return redirect(url_for('root'))
+
+    return redirect(url_for('root'))
 
 @app.route('/move_down', methods=['POST'])
 def move_down():

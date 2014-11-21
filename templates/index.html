@@ -136,7 +136,7 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">
                 <h2>{{ item._id }}</h2>
-                <div class="progress">
+                <div class="progress" data-value="{{ item.progress }}">
                   <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
                        aria-valuenow="{{ item.progress * 100 }}"
                        aria-valuemin="0"
@@ -144,7 +144,7 @@
                     <span class="sr-only">{{ item.progress * 100 }}% Complete</span>
                   </div>
                 </div>
-                <p>{{ item.description|safe }}</p>
+                <p class="description">{{ item.description|safe }}</p>
             </div>
         </div>
     </section>
@@ -230,6 +230,40 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-primary" id="add">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edit form -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="editModalLabel">Edit item</h4>
+          </div>
+          <div class="modal-body">
+            <form action="{{ url_for('edit_item') }}" method="post" role="form" id="edit-form">
+              <div class="form-group">
+                <label class="control-label">Name</label>
+                <p class="form-control-static" id="name" placeholder="name"></p>
+                <input type="hidden" name="name">
+              </div>
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" name="description" id="description"
+                          placeholder="description"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="progress">Progress</label>
+                <input type="text" class="form-control" name="progress" id="progress" placeholder="progress">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="edit-ok">Ok</button>
           </div>
         </div>
       </div>

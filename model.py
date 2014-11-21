@@ -21,6 +21,15 @@ def add(items, name, progress, description):
     except PyMongoError:
         raise DataError()
 
+def update(items, name, progress, description):
+    try:
+        items.update({'_id': name}, {'$set': {
+            'progress': progress,
+            'description': description
+            }})
+    except PyMongoError:
+        raise DataError()
+
 def remove(items, name):
     db_item = items.find_one({'_id': name})
     if db_item is None:
