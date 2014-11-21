@@ -5,6 +5,7 @@ from pymongo.errors import PyMongoError
 class DataError(Exception):
     pass
 
+
 def get_all(items):
     return list(items.find().sort('order', ASCENDING))
 
@@ -37,7 +38,7 @@ def remove(items, name):
 
     order = db_item['order']
     items.remove({'_id': name})
-    items.update({'order': {'$gt': order}}, {'$inc': {'order': -1}})
+    items.update({'order': {'$gt': order}}, {'$inc': {'order': -1}}, multi=True)
 
 def reorder(items, direction, name):
     db_item = items.find_one({'_id': name})
