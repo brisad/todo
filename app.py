@@ -15,7 +15,7 @@ def get_db():
     return g.db
 
 def db_items():
-    return get_db().todo.items
+    return get_db().get_default_database().items
 
 @app.teardown_appcontext
 def close_db(error):
